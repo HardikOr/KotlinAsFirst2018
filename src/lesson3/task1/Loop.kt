@@ -73,7 +73,7 @@ fun digitNumber(n: Int): Int {
     var count = 0
     var tempNumber = n
 
-    while (tempNumber > 0) {
+    while (tempNumber != 0) {
         count++
         tempNumber /= 10
     }
@@ -184,14 +184,13 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun sin(x: Double, eps: Double): Double {
-    var sinNumber = x
-    var n = x
     var fact = 1
-    var tempX = x
+    val tempX = x % (2 * PI)
 
-    while (tempX !in 0.0..2 * PI) tempX -= 2 * PI
+    var n = tempX
+    var sinNumber = tempX
 
-    while (abs(n) > eps) {
+    while (abs(n) >= eps) {
         n *= -tempX * tempX / (fact + 1) / (fact + 2)
         fact += 2
         sinNumber += n
@@ -211,9 +210,7 @@ fun cos(x: Double, eps: Double): Double {
     var cosNumber = 1.0
     var n = 1.0
     var fact = 0
-    var tempX = x
-
-    while (tempX !in 0.0..2 * PI) tempX -= 2 * PI
+    val tempX = x % (2 * PI)
 
     while (abs(n) > eps) {
         n *= -tempX * tempX / (fact + 1) / (fact + 2)

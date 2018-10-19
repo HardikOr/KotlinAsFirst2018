@@ -51,12 +51,12 @@ fun daysInMonth(month: Int, year: Int): Int {
             if (month % 2 == 0) 31 else 30
     }
 
-    val addFebDays = if (year % 100 == 0)
+    val addLeapYearDays = if (month == 2 && year % 100 == 0)
         if (year % 400 == 0) 1 else 0
     else
         if (year % 4 == 0) 1 else 0
 
-    return daysInMonth + addFebDays
+    return daysInMonth + addLeapYearDays
 }
 
 /**
@@ -83,14 +83,10 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
     val minSR = min(s, r)
     val maxSR = max(s, r)
 
-    if (min(a, b) <= minSR)
-        if (max(a, b) <= maxSR)
-            return true
-    if (min(a, c) <= minSR)
-        if (max(a, c) <= maxSR)
-            return true
-    if (min(c, b) <= minSR)
-        if (max(c, b) <= maxSR)
-            return true
-    return false
+    return when {
+        min(a, b) <= minSR && max(a, b) <= maxSR -> true
+        min(a, c) <= minSR && max(a, c) <= maxSR -> true
+        min(c, b) <= minSR && max(c, b) <= maxSR -> true
+        else -> false
+    }
 }

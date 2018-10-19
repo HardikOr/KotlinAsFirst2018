@@ -84,15 +84,15 @@ fun ageDescription(age: Int): String {
 fun timeForHalfWay(t1: Double, v1: Double,
                    t2: Double, v2: Double,
                    t3: Double, v3: Double): Double {
-    val s: Double = (v1 * t1 + v2 * t2 + v3 * t3) / 2
-    val s1: Double = v1 * t1
-    val s2: Double = v2 * t2
+    val s = (v1 * t1 + v2 * t2 + v3 * t3) / 2
+    val s1 = v1 * t1
+    val s2 = v2 * t2
 
-    if (s1 >= s)
-        return s / v1
-    if (s1 + s2 >= s)
-        return t1 + (s - s1) / v2
-    return t1 + t2 + (s - s1 - s2) / v3
+    return when {
+        s1 >= s -> s / v1
+        s1 + s2 >= s -> t1 + (s - s1) / v2
+        else -> t1 + t2 + (s - s1 - s2) / v3
+    }
 }
 
 /**
@@ -151,15 +151,15 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
 fun triangleKind(a: Double, b: Double, c: Double): Int {
     if (a + b <= c || a + c <= b || b + c <= a)
         return -1
-    val cos1: Double = (a * a + b * b - c * c) / (2 * a * b)
-    val cos2: Double = (a * a + c * c - b * b) / (2 * a * c)
-    val cos3: Double = (c * c + b * b - a * a) / (2 * c * b)
+    val cos1 = (a * a + b * b - c * c) / (2 * a * b)
+    val cos2 = (a * a + c * c - b * b) / (2 * a * c)
+    val cos3 = (c * c + b * b - a * a) / (2 * c * b)
 
-    if (cos1 == 0.0 || cos2 == 0.0 || cos3 == 0.0)
-        return 1
-    if (cos1 > 0 && cos2 > 0 && cos3 > 0)
-        return 0
-    return 2
+    return when {
+        cos1 == 0.0 || cos2 == 0.0 || cos3 == 0.0 -> 1
+        cos1 > 0 && cos2 > 0 && cos3 > 0 -> 0
+        else -> 2
+    }
 }
 
 /**
