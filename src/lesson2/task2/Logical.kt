@@ -51,7 +51,7 @@ fun daysInMonth(month: Int, year: Int): Int {
             if (month % 2 == 0) 31 else 30
     }
 
-    val addLeapYearDays = if (month == 2 && year % 100 == 0)
+    val addLeapYearDays = if (year % 100 == 0)
         if (year % 400 == 0) 1 else 0
     else
         if (year % 4 == 0) 1 else 0
