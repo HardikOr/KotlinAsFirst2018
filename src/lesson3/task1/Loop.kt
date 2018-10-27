@@ -311,10 +311,9 @@ fun fibSequenceDigit(n: Int): Int {
     var fib1 = 1
     var fib2 = 0
     var count = 0
-    var tmp: Int
 
     while (count < n) {
-        tmp = fib2
+        val tmp = fib2
         fib2 += fib1
         fib1 = tmp
         count += digitNumber(fib2)

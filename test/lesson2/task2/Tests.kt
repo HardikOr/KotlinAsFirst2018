@@ -45,6 +45,7 @@ class Tests {
         assertEquals(29, daysInMonth(2, 1996))
         assertEquals(28, daysInMonth(2, 1900))
         assertEquals(29, daysInMonth(2, 2000))
+        assertEquals(30, daysInMonth(4, 7483648))
     }
 
     @Test

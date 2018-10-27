@@ -410,7 +410,7 @@ fun ctr(n: Int, mode: Int): String {
         }
     }
 
-    when (n){
+    when (n) {
         1 -> return if (mode == 1) "один" else "одна тысяча "
         2 -> return if (mode == 1) "два" else "две тысячи "
         3 -> return if (mode == 1) "три" else "три тысячи "
@@ -439,4 +439,6 @@ fun ctr(n: Int, mode: Int): String {
     return if (mode == 1) str else "$str тысяч "
 }
 
-fun russian(n: Int): String = (if (n > 999) ctr(n / 1000, 2) else {""} + ctr(n % 1000, 1)).replace("  ", " ").trim()
+fun russian(n: Int): String = (if (n > 999) ctr(n / 1000, 2) else {
+    ""
+} + ctr(n % 1000, 1)).replace("  ", " ").trim()
