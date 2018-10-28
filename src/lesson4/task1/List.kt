@@ -4,6 +4,7 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.log
+import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.pow
 
@@ -254,7 +255,7 @@ fun factorizeToString(n: Int) = factorize(n).joinToString(separator = "*")
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    val len = log(n.toDouble(), base.toDouble()).toInt()
+    val len = if (n == 0) 0 else log(n.toDouble(), base.toDouble()).toInt()
     var power = (base.toDouble()).pow(len).toInt()
 
     val list = MutableList(len + 1) { 0 }
@@ -387,7 +388,7 @@ fun ctr(n: Int, mode: Int): String {
             3 -> "триста $str"
             4 -> "четыреста $str"
             5 -> "пятьсот $str"
-            6 -> "шестьсто $str"
+            6 -> "шестьсот $str"
             7 -> "семьсот $str"
             8 -> "восемьсот $str"
             9 -> "девятьсот $str"
