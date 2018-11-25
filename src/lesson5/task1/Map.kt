@@ -285,8 +285,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
+fun symMap(word: String) = word.toLowerCase().toCharArray().toSet()
+
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        if (word.isEmpty()) true else word.toLowerCase().toCharArray().toSet() == chars.toSet()
+        if (word.isEmpty()) true else symMap(word) == symMap(word).intersect(chars.toSet())
 
 /**
  * Средняя
@@ -343,7 +345,7 @@ fun hasAnagrams(words: List<String>): Boolean =
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for (i in list)
-        if (number - i in list && i != number - i)
+        if (number - i in list && list.indexOf(i) != list.indexOf(number - i))
             return Pair(list.indexOf(i), list.indexOf(number - i))
 
     return Pair(-1, -1)
