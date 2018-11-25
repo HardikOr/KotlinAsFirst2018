@@ -285,10 +285,8 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun symMap(word: String) = word.toLowerCase().toCharArray().toSet()
-
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        if (word.isEmpty()) true else symMap(word) == symMap(word).intersect(chars.toSet())
+        chars.map { it.toLowerCase() }.toSet() == (word + chars.joinToString("")).toLowerCase().toSet()
 
 /**
  * Средняя
@@ -317,7 +315,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun symbolsMap2(str: String) =
-        symbolsMap(str.toCharArray().map { it.toString() })
+        symbolsMap(str.map { it.toString() })
 
 fun extractMapRepeats(map: List<Map<String, Int>>) =
         map.groupingBy { it }.eachCount()
@@ -345,7 +343,7 @@ fun hasAnagrams(words: List<String>): Boolean =
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for (i in list)
-        if (number - i in list && list.indexOf(i) != list.indexOf(number - i))
+        if (number - i in list && list.indexOf(i) != list.toMutableList().minusElement(i).indexOf(number - i))
             return Pair(list.indexOf(i), list.indexOf(number - i))
 
     return Pair(-1, -1)
