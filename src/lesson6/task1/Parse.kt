@@ -2,6 +2,10 @@
 
 package lesson6.task1
 
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
+import java.util.*
+
 /**
  * Пример
  *
@@ -58,7 +62,6 @@ fun main(args: Array<String>) {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
-
 
 /**
  * Средняя
@@ -207,4 +210,62 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val com = commands.toList()
+
+    if (Regex("[><+\\-\\[\\]\\s]*").matches(commands)) {
+        var cyclam = 0
+        for (i in com) {
+            cyclam += when (i) {
+                '[' -> 1
+                ']' -> -1
+                else -> 0
+            }
+            if (cyclam < 0)
+                throw IllegalArgumentException()
+        }
+        if (cyclam != 0)
+            throw IllegalArgumentException()
+    } else
+        throw IllegalArgumentException()
+
+    val stack = Stack<Int>()
+    var pos = Math.floor(cells / 2.0).toInt()
+    var lim = 0
+
+    val list = mutableListOf<Int>()
+    for (i in 0 until cells) list.add(0)
+
+    var index = 0
+    while (index < com.size && lim < limit) {
+        when (com[index]) {
+            '>' -> pos++
+            '<' -> pos--
+            '+' -> list[pos]++
+            '-' -> list[pos]--
+            '[' -> if (list[pos] != 0)
+                stack.push(index)
+            else {
+                var cyclam = 1
+                while (cyclam != 0) {
+                    index++
+                    cyclam += when (com[index]) {
+                        '[' -> 1
+                        ']' -> -1
+                        else -> 0
+                    }
+                }
+            }
+            ']' -> if (list[pos] == 0)
+                stack.pop()
+            else
+                index = stack.peek()
+        }
+        lim++
+        index++
+        if (pos < 0 || pos > cells)
+            throw IllegalStateException()
+    }
+
+    return list
+}
