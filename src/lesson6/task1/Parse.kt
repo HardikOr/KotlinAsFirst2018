@@ -263,7 +263,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         }
         lim++
         index++
-        if (pos < 0 || pos > cells)
+        if (pos < 0 || pos == cells)
             throw IllegalStateException()
     }
 
