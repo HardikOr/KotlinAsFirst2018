@@ -4,7 +4,6 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.log
-import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.pow
 
@@ -118,13 +117,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double {
-    var mod = 0.0
-
-    v.forEach { mod += it * it }
-
-    return if (v.isEmpty()) 0.0 else sqrt(mod)
-}
+fun abs(v: List<Double>) = sqrt(v.fold(0.0) { sum, el -> sum + el * el })
 
 /**
  * Простая
@@ -160,15 +153,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.0.
  */
-fun times(a: List<Double>, b: List<Double>): Double {
-    if (a.isEmpty())
-        return 0.0
-
-    var sum = 0.0
-    for (i in 0..(a.size - 1)) sum += a[i] * b[i]
-
-    return sum
-}
+fun times(a: List<Double>, b: List<Double>) = a.foldIndexed(0.0) { i, sum, el -> sum + el * b[i] }
 
 /**
  * Средняя
@@ -178,19 +163,7 @@ fun times(a: List<Double>, b: List<Double>): Double {
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0.0 при любом x.
  */
-fun polynom(p: List<Double>, x: Double): Double {
-    if (p.isEmpty())
-        return 0.0
-
-    var sum = 0.0
-    var tempX = 1.0
-    for (i in 0..(p.size - 1)) {
-        sum += tempX * p[i]
-        tempX *= x
-    }
-
-    return sum
-}
+fun polynom(p: List<Double>, x: Double) = p.foldIndexed(0.0) { i, sum, el -> sum + el * Math.pow(x, i.toDouble()) }
 
 /**
  * Средняя
@@ -289,14 +262,7 @@ fun convertToSymbol(s: Int): Char {
     return '0' + s
 }
 
-fun convertToString(n: Int, base: Int): String {
-    val list = convert(n, base)
-    var str: String = convertToSymbol(list[0]).toString()
-
-    for (i in 1..(list.size - 1)) str += convertToSymbol(list[i])
-
-    return str
-}
+fun convertToString(n: Int, base: Int) = convert(n, base).fold("") { sum, el -> sum + convertToSymbol(el) }
 
 /**
  * Средняя
@@ -362,7 +328,9 @@ fun convertToRoman(n: Int, s1: String, s2: String, s3: String) = when (n) {
 }
 
 fun roman(n: Int): String {
-    val str = convertToRoman((n % 1000) / 100, "C", "D", "M") + convertToRoman((n % 100) / 10, "X", "L", "C") + convertToRoman(n % 10, "I", "V", "X")
+    val str = convertToRoman((n % 1000) / 100, "C", "D", "M") +
+            convertToRoman((n % 100) / 10, "X", "L", "C") +
+            convertToRoman(n % 10, "I", "V", "X")
 
     return when (n / 1000) {
         1 -> "M$str"

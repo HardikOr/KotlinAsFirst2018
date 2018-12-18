@@ -121,11 +121,11 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val res = mutableMapOf<Int, MutableList<String>>()
 
-    for ((key, value) in grades)
-        if (value in res)
-            res[value]!!.add(key)
-        else
-            res[value] = mutableListOf(key)
+    for ((key, value) in grades) {
+        val a = res.getOrPut(value) { mutableListOf() }
+        a.add(key)
+        res[value] = a
+    }
 
     return res
 }
@@ -232,8 +232,9 @@ fun checkAndAddHandshakes(friends: Map<String, Set<String>>,
     if (fset.isEmpty())
         return
 
-    for (i in fset) if (i != name && i !in map[name]!!) {
-        map[name]!!.add(i)
+    for (i in fset)
+        if (i != name && i !in map[name]!!) {
+            map[name]!!.add(i)
         if (i in friends) checkAndAddHandshakes(friends, map, name, friends[i]!!)
     }
 }
@@ -314,14 +315,18 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun symbolsMap2(str: String) =
-        symbolsMap(str.map { it.toString() })
-
-fun extractMapRepeats(map: List<Map<String, Int>>) =
-        map.groupingBy { it }.eachCount()
-
+//fun symbolsMap2(str: String) =
+//        symbolsMap(str.map { it.toString() })
+//
+//fun extractMapRepeats(map: List<Map<String, Int>>) =
+//        map.groupingBy { it }.eachCount()
+//
+//fun hasAnagrams(words: List<String>): Boolean =
+//        extractMapRepeats(words.map { symbolsMap2(it) })
+//                .filter { it.value > 1 }.isNotEmpty()
 fun hasAnagrams(words: List<String>): Boolean =
-        extractMapRepeats(words.map { symbolsMap2(it) })
+        words.map { it2 -> symbolsMap(it2.map { it2 }) }
+                .groupingBy { it }.eachCount()
                 .filter { it.value > 1 }.isNotEmpty()
 
 /**
@@ -342,9 +347,19 @@ fun hasAnagrams(words: List<String>): Boolean =
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    for (i in list)
-        if (number - i in list && list.indexOf(i) != list.toMutableList().minusElement(i).indexOf(number - i))
-            return Pair(list.indexOf(i), list.indexOf(number - i))
+    val map = list.mapIndexed { index, i -> Pair(i, index) }.groupBy({ it.first }, { it.second })
+
+    for ((key, value) in map) {
+        val second = map[number - key]
+        if (second != null)
+            return if (key == number - key)
+                if (value.size > 1)
+                    Pair(value[0], value[1])
+                else
+                    continue
+            else
+                Pair(value[0], second[0])
+    }
 
     return Pair(-1, -1)
 }
