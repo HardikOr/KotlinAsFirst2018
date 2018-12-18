@@ -315,18 +315,14 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-//fun symbolsMap2(str: String) =
-//        symbolsMap(str.map { it.toString() })
-//
-//fun extractMapRepeats(map: List<Map<String, Int>>) =
-//        map.groupingBy { it }.eachCount()
-//
-//fun hasAnagrams(words: List<String>): Boolean =
-//        extractMapRepeats(words.map { symbolsMap2(it) })
-//                .filter { it.value > 1 }.isNotEmpty()
+fun symbolsMap2(str: String) =
+        symbolsMap(str.map { it.toString() })
+
+fun extractMapRepeats(map: List<Map<String, Int>>) =
+        map.groupingBy { it }.eachCount()
+
 fun hasAnagrams(words: List<String>): Boolean =
-        words.map { it2 -> symbolsMap(it2.map { it2 }) }
-                .groupingBy { it }.eachCount()
+        extractMapRepeats(words.map { symbolsMap2(it) })
                 .filter { it.value > 1 }.isNotEmpty()
 
 /**

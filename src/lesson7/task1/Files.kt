@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
 
 /**
  * Пример
@@ -257,7 +258,80 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).printWriter()
+
+    writer.println("<html><body><p>")
+
+    var sOpened = false
+    var iOpened = false
+    var bOpened = false
+    for (line in File(inputName).readLines()) {
+        val txt = line.split(Regex("\\~{2}"))
+        var newtxt = ""
+
+        for ((index, i) in txt.withIndex()) {
+            newtxt += i + when {
+                index == txt.lastIndex -> ""
+                sOpened == true -> "</s>"
+                else -> "<s>"
+            }
+            if (index != txt.lastIndex)
+                sOpened = !sOpened
+        }
+
+        val words = newtxt.split(Regex("[\\*]+"))
+        val splits = newtxt.split(Regex("[^\\*]+"))
+
+        val list = mutableListOf<String>()
+        if (line.isEmpty())
+            writer.println("</p><p>")
+        else {
+            for (i in splits) {
+                when (i) {
+                    "*" -> {
+                        if (!iOpened)
+                            list.add("<i>")
+                        else
+                            list.add("</i>")
+                        iOpened = !iOpened
+                    }
+                    "**" -> {
+                        if (!bOpened)
+                            list.add("<b>")
+                        else
+                            list.add("</b>")
+                        bOpened = !bOpened
+                    }
+                    "***" -> {
+                        if (!iOpened && !bOpened)
+                            list.add("<b><i>")
+                        else if (!iOpened && bOpened)
+                            list.add("</b><i>")
+                        else if (iOpened && !bOpened)
+                            list.add("</i><b>")
+                        else if (list.last() == "<b>")
+                            list.add("</b></i>")
+                        else
+                            list.add("</i></b>")
+                    }
+                }
+            }
+        }
+
+        newtxt = ""
+        for ((index, i) in words.withIndex()) {
+            newtxt += i + when {
+                index == words.lastIndex -> ""
+                sOpened == true -> list[index]
+                else -> list[index]
+            }
+        }
+
+        writer.println(newtxt)
+    }
+
+    writer.println("</p></body></html>")
+    writer.close()
 }
 
 /**
