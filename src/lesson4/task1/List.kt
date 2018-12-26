@@ -257,9 +257,9 @@ fun convert(n: Int, base: Int): List<Int> {
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
 fun convertToSymbol(s: Int): Char {
-    if (s in 10..36)
-        return 'a' + s - 10
-    return '0' + s
+    if ('0' + s in '0'..'9')
+        return '0' + s
+    return 'a' + s - 10
 }
 
 fun convertToString(n: Int, base: Int) = convert(n, base).fold("") { sum, el -> sum + convertToSymbol(el) }
@@ -408,6 +408,6 @@ fun ctr(n: Int, mode: Int): String {
     return if (mode == 1) str else "$str тысяч "
 }
 
-fun russian(n: Int): String = (if (n > 999) ctr(n / 1000, 2) else {
-    ""
-} + ctr(n % 1000, 1)).replace("  ", " ").trim()
+fun russian(n: Int): String =
+        ((if (n > 999) ctr(n / 1000, 2) else "") + ctr(n % 1000, 1))
+                .replace("  ", " ").trim()

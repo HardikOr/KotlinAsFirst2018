@@ -33,8 +33,7 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
                 if (word.length + currentLineLength >= lineLength) {
                     outputStream.newLine()
                     currentLineLength = 0
-                }
-                else {
+                } else {
                     outputStream.write(" ")
                     currentLineLength++
                 }
@@ -72,7 +71,14 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).printWriter()
+    val text = File(inputName).readText()
+
+    val map = mapOf("ы" to "и", "Ы" to "И", "я" to "а", "Я" to "А", "ю" to "у", "Ю" to "У")
+
+    writer.println(text.replace(Regex("[жчшщЖЧШЩ][ыяюЫЯЮ]"))
+    { it.value.first().toString() + map[it.value.last().toString()] })
+    writer.close()
 }
 
 /**
@@ -257,77 +263,93 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+fun markdownLine(line: String): String {
+    val txt = line.split(Regex("\\~{2}"))
+    var newtxt = ""
+
+    var sOpened = false
+    var sAm = txt.size - 1
+
+    for (i in txt) {
+        newtxt += i + when {
+            sAm == 0 -> ""
+            !sOpened -> if (sAm == 1) "~~" else "<s>"
+            else -> "</s>"
+        }
+        sOpened = !sOpened
+        sAm--
+    }
+
+    val words = newtxt.split(Regex("[\\*]+"))
+    val splits = newtxt.split(Regex("[^\\*]+"))
+
+    var iOpened = false
+    var bOpened = false
+
+    var iAm = 0
+    var bAm = 0
+
+    for (i in splits) {
+        when (i) {
+            "*" -> iAm++
+            "**" -> bAm++
+            "***" -> {
+                iAm++
+                bAm++
+            }
+        }
+    }
+
+    val q = ArrayDeque<String>()
+
+    for (i in splits) {
+        when (i) {
+            "*" -> {
+                q += when {
+                    !iOpened -> if (iAm == 1) "*" else "<i>"
+                    else -> "</i>"
+                }
+                iOpened = !iOpened
+                iAm--
+            }
+            "**" -> {
+                q += when {
+                    !bOpened -> if (bAm == 1) "**" else "<b>"
+                    else -> "</b>"
+                }
+                bOpened = !bOpened
+                bAm--
+            }
+            "***" -> {
+                q += when {
+                    !iOpened && !bOpened -> "<b><i>"
+                    !iOpened && bOpened -> if (iAm == 1) "</b>*" else "</b><i>"
+                    iOpened && !bOpened -> if (bAm == 1) "</i>**" else "</i><b>"
+                    q.peekLast() == "<b>" -> "</b></i>"
+                    else -> "</i></b>"
+                }
+                iOpened = !iOpened
+                bOpened = !bOpened
+                iAm--
+                bAm--
+            }
+        }
+    }
+
+    q.add("")
+    return words.fold("") { sum, el -> sum + el + q.remove() }
+}
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val writer = File(outputName).printWriter()
 
     writer.println("<html><body><p>")
 
-    var sOpened = false
-    var iOpened = false
-    var bOpened = false
     for (line in File(inputName).readLines()) {
-        val txt = line.split(Regex("\\~{2}"))
-        var newtxt = ""
-
-        for ((index, i) in txt.withIndex()) {
-            newtxt += i + when {
-                index == txt.lastIndex -> ""
-                sOpened == true -> "</s>"
-                else -> "<s>"
-            }
-            if (index != txt.lastIndex)
-                sOpened = !sOpened
-        }
-
-        val words = newtxt.split(Regex("[\\*]+"))
-        val splits = newtxt.split(Regex("[^\\*]+"))
-
-        val list = mutableListOf<String>()
-        if (line.isEmpty())
-            writer.println("</p><p>")
-        else {
-            for (i in splits) {
-                when (i) {
-                    "*" -> {
-                        if (!iOpened)
-                            list.add("<i>")
-                        else
-                            list.add("</i>")
-                        iOpened = !iOpened
-                    }
-                    "**" -> {
-                        if (!bOpened)
-                            list.add("<b>")
-                        else
-                            list.add("</b>")
-                        bOpened = !bOpened
-                    }
-                    "***" -> {
-                        if (!iOpened && !bOpened)
-                            list.add("<b><i>")
-                        else if (!iOpened && bOpened)
-                            list.add("</b><i>")
-                        else if (iOpened && !bOpened)
-                            list.add("</i><b>")
-                        else if (list.last() == "<b>")
-                            list.add("</b></i>")
-                        else
-                            list.add("</i></b>")
-                    }
-                }
-            }
-        }
-
-        newtxt = ""
-        for ((index, i) in words.withIndex()) {
-            newtxt += i + when {
-                index == words.lastIndex -> ""
-                sOpened == true -> list[index]
-                else -> list[index]
-            }
-        }
-
-        writer.println(newtxt)
+        writer.println(when {
+            line.isEmpty() -> "</p><p>"
+            else -> markdownLine(line)
+        })
     }
 
     writer.println("</p></body></html>")
@@ -428,7 +450,47 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).printWriter()
+
+    writer.println("<html><body>")
+
+    val stack = Stack<String>()
+
+    var pShift = -1
+    for (line in File(inputName).readLines()) {
+        val shift = Regex(" {4}").findAll(line).count()
+        val newline = Regex(" ").split(line.replace(Regex(" {4}"), ""), 2)
+        val isNum = newline.first() != "*"
+        val text = newline.last()
+
+        when {
+            shift > pShift -> if (isNum) {
+                writer.println("<ol>")
+                stack.push("</ol>")
+            } else {
+                writer.println("<ul>")
+                stack.push("</ul>")
+            }
+            shift < pShift -> {
+                writer.println(stack.pop())
+                writer.println(stack.pop())
+                writer.println(stack.pop())
+            }
+            else -> if (stack.isNotEmpty())
+                writer.println(stack.pop())
+        }
+
+        pShift = shift
+
+        writer.println("<li>$text")
+        stack.push("</li>")
+    }
+
+    while (stack.isNotEmpty())
+        writer.println(stack.pop())
+
+    writer.println("</body></html>")
+    writer.close()
 }
 
 /**
@@ -440,7 +502,70 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).printWriter()
+
+    writer.println("<html><body>")
+
+    val stack = Stack<String>()
+
+    var pShift = -1
+    var pEmpty = true
+    for (line in File(inputName).readLines()) {
+        when {
+            line.isEmpty() -> {
+                while (stack.isNotEmpty())
+                    writer.println(stack.pop())
+                pEmpty = true
+            }
+            Regex("( {4})*(\\* |\\d+\\. )").split(line).first() == "" -> {
+                val shift = Regex(" {4}").findAll(line).count()
+                val newline = Regex(" ").split(line.replace(Regex(" {4}"), ""), 2)
+                val isNum = newline.first() != "*"
+                val text = markdownLine(newline.last())
+
+                if (pEmpty) pShift = -1
+
+                when {
+                    shift > pShift -> if (isNum) {
+                        writer.println("<ol>")
+                        stack.push("</ol>")
+                    } else {
+                        writer.println("<ul>")
+                        stack.push("</ul>")
+                    }
+                    shift < pShift -> {
+                        writer.println(stack.pop())
+                        writer.println(stack.pop())
+                        writer.println(stack.pop())
+                    }
+                    else -> if (stack.isNotEmpty())
+                        writer.println(stack.pop())
+                }
+
+                pShift = shift
+                pEmpty = false
+
+                writer.println("<li>$text")
+                stack.push("</li>")
+            }
+            else -> {
+                if (pEmpty) {
+                    writer.println("<p>")
+                    stack.push("</p>")
+                }
+
+                pEmpty = false
+
+                writer.println(markdownLine(line))
+            }
+        }
+    }
+
+    while (stack.isNotEmpty())
+        writer.println(stack.pop())
+
+    writer.println("</body></html>")
+    writer.close()
 }
 
 /**

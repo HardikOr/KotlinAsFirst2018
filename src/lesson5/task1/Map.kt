@@ -235,8 +235,9 @@ fun checkAndAddHandshakes(friends: Map<String, Set<String>>,
     for (i in fset)
         if (i != name && i !in map[name]!!) {
             map[name]!!.add(i)
-        if (i in friends) checkAndAddHandshakes(friends, map, name, friends[i]!!)
-    }
+            if (i in friends)
+                checkAndAddHandshakes(friends, map, name, friends[i]!!)
+        }
 }
 
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
@@ -315,15 +316,18 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun symbolsMap2(str: String) =
-        symbolsMap(str.map { it.toString() })
-
-fun extractMapRepeats(map: List<Map<String, Int>>) =
-        map.groupingBy { it }.eachCount()
-
-fun hasAnagrams(words: List<String>): Boolean =
-        extractMapRepeats(words.map { symbolsMap2(it) })
-                .filter { it.value > 1 }.isNotEmpty()
+//fun symbolsMap2(str: String) =
+//        symbolsMap(str.map { it.toString() })
+//
+//fun extractMapRepeats(map: List<Map<String, Int>>) =
+//        map.groupingBy { it }.eachCount()
+//
+//fun hasAnagrams(words: List<String>): Boolean =
+//        extractMapRepeats(words.map { symbolsMap2(it) })
+//                .filter { it.value > 1 }.isNotEmpty()
+fun hasAnagrams(words: List<String>) = words.map { it2 -> symbolsMap(it2.map { it.toString() }) }
+        .groupingBy { it }.eachCount()
+        .filter { it.value > 1 }.isNotEmpty()
 
 /**
  * Сложная
@@ -347,14 +351,16 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 
     for ((key, value) in map) {
         val second = map[number - key]
-        if (second != null)
-            return if (key == number - key)
+        if (second != null) {
+            return if (key == number - key) {
                 if (value.size > 1)
                     Pair(value[0], value[1])
                 else
                     continue
+            }
             else
                 Pair(value[0], second[0])
+        }
     }
 
     return Pair(-1, -1)
